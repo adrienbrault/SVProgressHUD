@@ -8,6 +8,20 @@
 #import "SVProgressHUD.h"
 #import <QuartzCore/QuartzCore.h>
 
+
+static void correctCenterPoint(UIView *view)
+{
+    CGFloat xOffset = fmod(view.bounds.size.width, 2.0) / 2.0;
+    CGFloat yOffset = fmod(view.bounds.size.height, 2.0) / 2.0;
+    
+    BOOL shouldCorrectX = view.center.x != 0.0 && view.center.x != floor(view.center.x) + xOffset;
+    BOOL shouldCorrectY = view.center.y != 0.0 && view.center.y != floor(view.center.y) + yOffset;
+    
+    view.center = CGPointMake(shouldCorrectX ? view.center.x + xOffset : view.center.x,
+                              shouldCorrectY ? view.center.y + yOffset : view.center.y);
+}
+
+
 @interface SVProgressHUD ()
 
 @property (nonatomic, readwrite) SVProgressHUDMaskType maskType;
@@ -225,12 +239,17 @@ static SVProgressHUD *sharedView = nil;
 	
 	if(string)
     {
-		self.spinnerView.center = CGPointMake(ceil(CGRectGetWidth(_hudView.bounds)/2)+0.5, 40.5);
+		self.spinnerView.center = CGPointMake(ceil(CGRectGetWidth(_hudView.bounds)/2), 40);
     }
 	else
     {
-		self.spinnerView.center = CGPointMake(ceil(CGRectGetWidth(_hudView.bounds)/2)+0.5, ceil(_hudView.bounds.size.height/2)+0.5);
+		self.spinnerView.center = CGPointMake(ceil(CGRectGetWidth(_hudView.bounds)/2), ceil(_hudView.bounds.size.height/2));
     }
+    
+    correctCenterPoint(self.imageView);
+    correctCenterPoint(self.stringLabel);
+    correctCenterPoint(self.spinnerView);
+    correctCenterPoint(_hudView);
 }
 
 
